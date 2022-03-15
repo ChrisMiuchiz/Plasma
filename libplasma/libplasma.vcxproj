@@ -20,15 +20,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\PLXStreamReader.cpp" />
+    <ClCompile Include="src\StreamReader.cpp" />
     <ClCompile Include="src\GLEngine.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\ObjectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine.h" />
+    <ClInclude Include="include\PLXStreamReader.h" />
+    <ClInclude Include="include\StreamReader.h" />
     <ClInclude Include="include\GLEngine.h" />
     <ClInclude Include="include\Object.h" />
     <ClInclude Include="include\ObjectManager.h" />
+    <ClInclude Include="include\types.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

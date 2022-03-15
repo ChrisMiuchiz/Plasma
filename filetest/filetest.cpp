@@ -1,8 +1,10 @@
 #include <iostream>
 #include "Object.h"
+#include "GLEngine.h"
 
 int main()
 {
-    plasma::Object obj((plasma::Engine*)0x12345678);
+    plasma::GLEngine engine;
+    plasma::Object obj(&engine);
     std::cout << "Engine: " << obj.GetEngine() << std::endl;
 }

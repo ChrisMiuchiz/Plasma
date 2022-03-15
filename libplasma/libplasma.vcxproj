@@ -19,10 +19,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\GLEngine.cpp" />
     <ClCompile Include="src\Object.cpp" />
+    <ClCompile Include="src\ObjectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Engine.h" />
+    <ClInclude Include="include\GLEngine.h" />
     <ClInclude Include="include\Object.h" />
+    <ClInclude Include="include\ObjectManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

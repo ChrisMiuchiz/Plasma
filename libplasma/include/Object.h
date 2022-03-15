@@ -1,3 +1,4 @@
+#pragma once
 namespace plasma {
 	class Engine;
 	class Object {

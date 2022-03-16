@@ -1,7 +1,6 @@
 #include <iostream>
 #include "Object.h"
 #include "GLEngine.h"
-#include "FileReader.h"
 
 int main()
 {

@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Engine.h" />
+    <ClInclude Include="include\PageInfo.h" />
     <ClInclude Include="include\PLXStreamReader.h" />
     <ClInclude Include="include\StreamReader.h" />
     <ClInclude Include="include\GLEngine.h" />

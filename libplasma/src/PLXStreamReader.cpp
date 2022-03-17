@@ -36,11 +36,24 @@ namespace plasma {
 		}
 
 		m_obfuscationHash = 0;
-		while (!m_stream->eof()) {
+		while (m_stream->peek() != EOF) {
 			std::string chunkName = ParseChunkHeader();
 			std::cout << "Chunk: " << chunkName << std::endl;
 
-			ParseChunkLength();
+			ParseChunkLength(); // this is in the chunk specific blocks in plasma
+
+			if (chunkName == "PlasmaGraphics") {
+				ReadPlasmaGraphics();
+			}
+			else if (chunkName == "Seal") {
+				bool validLicense = ReadSeal();
+
+				if (!validLicense) {
+					//TODO: throw exception
+					std::cout << "License key invalid" << std::endl;
+				}
+			}
+
 			// This is for testing, not originally a plasma feature
 			if (m_chunkEnds.size() > 0) {
 				std::streampos next = m_chunkEnds.front();
@@ -64,15 +77,9 @@ namespace plasma {
 
 			if (unobfuscated) {
 				newChunkName = ReadString();
-				if (newChunkName == "Seal") m_obfuscationHash = StringHash("PlasmaXGraphics"); // REMOVE ME
 			}
 			else {
-				// Do the deobfuscation
-				std::vector<char> obfuscatedBytes = ReadByteArray();
-				std::cout << "obfuscatedBytes size " << obfuscatedBytes.size() << std::endl;
-				DeobfuscateString(obfuscatedBytes.data(), obfuscatedBytes.size(), (char*)&m_obfuscationHash);
-				obfuscatedBytes.push_back('\0'); // Not exactly how plasma does this
-				newChunkName = obfuscatedBytes.data();
+				newChunkName = ReadObfuscatedString();
 			}
 
 			m_chunkTypeNames[newChunkID] = newChunkName;
@@ -84,5 +91,38 @@ namespace plasma {
 		}
 
 		return m_chunkTypeNames[chunkID];
+	}
+
+	void PLXStreamReader::ReadPlasmaGraphics() {
+		u32 version = ReadVal<u32>();
+		std::cout << "PlasmaGraphics version " << version << std::endl;
+		if (version > 1) {
+			//TODO: throw exception
+			std::cout << "PLX wrong version" << std::endl;
+		}
+		NextChunk();
+	}
+
+	bool PLXStreamReader::ReadSeal() {
+		bool validLicense = false;
+		std::vector<u64> keysToTry = m_keys;
+
+		// Two default keys
+		keysToTry.push_back(0);
+		keysToTry.push_back(StringHash("PlasmaGraphics"));
+
+		std::string magic = "PlasmaGraphics";
+		std::vector<char> obfuscatedMagic = ReadByteArray();
+
+		for (u64 key : keysToTry) {
+			std::string deobfuscatedMagic = DeobfuscateString(obfuscatedMagic, key);
+			if (deobfuscatedMagic == magic) {
+				m_obfuscationHash = key;
+				validLicense = true;
+			}
+		}
+
+		NextChunk();
+		return validLicense;
 	}
 };

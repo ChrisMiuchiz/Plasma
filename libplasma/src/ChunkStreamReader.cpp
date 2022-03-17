@@ -37,6 +37,13 @@ namespace plasma {
 		return "";
 	}
 
+	std::string ChunkStreamReader::ReadObfuscatedString() {
+		std::vector<char> obfuscatedBytes = ReadByteArray();
+		DeobfuscateString(obfuscatedBytes.data(), obfuscatedBytes.size(), (char*)&m_obfuscationHash);
+		obfuscatedBytes.push_back('\0'); // Not exactly how plasma does this
+		return obfuscatedBytes.data();
+	}
+
 	std::vector<char> ChunkStreamReader::ReadByteArray() {
 		u32 size = ReadVal<u32>();
 		std::vector<char> result;
@@ -74,5 +81,23 @@ namespace plasma {
 		}
 
 		memcpy(buffer, output.data(), length);
+	}
+
+	std::string ChunkStreamReader::DeobfuscateString(const std::vector<char>& bytes, u64 key) {
+		u64 stringSize = bytes.size();
+		u64 bufferSize = stringSize + 1;
+		char* buffer = new char[bufferSize];
+		memcpy(buffer, bytes.data(), bytes.size());
+		u64 obfuscationKey = key;
+
+		DeobfuscateString(buffer, stringSize, (char*)&obfuscationKey);
+
+		buffer[stringSize] = '\0';
+
+		std::string result = buffer;
+
+		delete[] buffer;
+
+		return result;
 	}
 };

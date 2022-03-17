@@ -13,9 +13,11 @@ namespace plasma {
 		ChunkStreamReader(std::ifstream* stream);
 		void ParseChunkLength();
 		std::string ReadString();
+		std::string ReadObfuscatedString();
 		std::vector<char> ReadByteArray();
 		bool NextChunk();
 		void DeobfuscateString(char* buffer, u32 length, char* obfuscationKey);
+		std::string DeobfuscateString(const std::vector<char>& bytes, u64 key);
 
 		template <typename T>
 		T ReadVal() {

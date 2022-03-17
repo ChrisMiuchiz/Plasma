@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\PLXStreamReader.cpp" />
-    <ClCompile Include="src\StreamReader.cpp" />
+    <ClCompile Include="src\ChunkStreamReader.cpp" />
     <ClCompile Include="src\GLEngine.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\ObjectManager.cpp" />
@@ -30,7 +30,7 @@
     <ClInclude Include="include\Engine.h" />
     <ClInclude Include="include\PageInfo.h" />
     <ClInclude Include="include\PLXStreamReader.h" />
-    <ClInclude Include="include\StreamReader.h" />
+    <ClInclude Include="include\ChunkStreamReader.h" />
     <ClInclude Include="include\GLEngine.h" />
     <ClInclude Include="include\Object.h" />
     <ClInclude Include="include\ObjectManager.h" />
@@ -90,9 +90,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>

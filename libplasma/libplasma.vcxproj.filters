@@ -27,7 +27,7 @@
     <ClCompile Include="src\GLEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\StreamReader.cpp">
+    <ClCompile Include="src\ChunkStreamReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PLXStreamReader.cpp">
@@ -47,7 +47,7 @@
     <ClInclude Include="include\GLEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\StreamReader.h">
+    <ClInclude Include="include\ChunkStreamReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\types.h">

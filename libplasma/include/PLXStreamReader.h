@@ -1,5 +1,5 @@
 #pragma once
-#include "StreamReader.h"
+#include "ChunkStreamReader.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -8,7 +8,7 @@ namespace plasma {
 	class Engine;
 	struct PageInfo;
 	class Node;
-	class PLXStreamReader : public StreamReader {
+	class PLXStreamReader : public ChunkStreamReader {
 	public:
 		PLXStreamReader(Engine* engine, PageInfo* pageInfo, Node* targetNode, u32 fileFlags, std::ifstream* stream, std::vector<u64> keys);
 		void Read();

@@ -13,8 +13,10 @@ namespace plasma {
 		PLXStreamReader(Engine* engine, PageInfo* pageInfo, Node* targetNode, u32 fileFlags, std::ifstream* stream, std::vector<u64> keys);
 		void Read();
 		std::string ParseChunkHeader();
+		bool Decompress(const std::vector<char>& input, std::vector<char>& output);
 		void ReadPlasmaGraphics();
 		bool ReadSeal();
+		void ReadTexture();
 
 		enum class FLAGS : u32 {
 			CHECK_FORMAT = 0x40

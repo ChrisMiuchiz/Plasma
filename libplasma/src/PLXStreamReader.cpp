@@ -1,5 +1,6 @@
 #include "PLXStreamReader.h"
 #include <iostream>
+#include "zlib.h"
 namespace plasma {
 	PLXStreamReader::PLXStreamReader(Engine* engine, PageInfo* pageInfo, Node* targetNode, u32 fileFlags, std::ifstream* stream, std::vector<u64> keys) 
 		: ChunkStreamReader(stream) {
@@ -53,6 +54,9 @@ namespace plasma {
 					std::cout << "License key invalid" << std::endl;
 				}
 			}
+			else if (chunkName == "Texture") {
+				ReadTexture();
+			}
 
 			// This is for testing, not originally a plasma feature
 			if (m_chunkEnds.size() > 0) {
@@ -93,6 +97,23 @@ namespace plasma {
 		return m_chunkTypeNames[chunkID];
 	}
 
+	bool PLXStreamReader::Decompress(const std::vector<char>& input, std::vector<char>& output) {
+		char buffer[128000] = { 0 };
+		Bytef* dest = (Bytef*)&buffer;
+		uLongf destLen = sizeof(buffer);
+		Bytef* source = (Bytef*)input.data();
+		uLong sourceLen = input.size();
+		if (uncompress(dest, &destLen, source, sourceLen) == Z_OK) {
+			output.resize(destLen);
+			memcpy(output.data(), dest, destLen);
+			return false;
+		}
+		else {
+			output.clear();
+			return true;
+		}
+	}
+
 	void PLXStreamReader::ReadPlasmaGraphics() {
 		u32 version = ReadVal<u32>();
 		std::cout << "PlasmaGraphics version " << version << std::endl;
@@ -124,5 +145,9 @@ namespace plasma {
 
 		NextChunk();
 		return validLicense;
+	}
+
+	void PLXStreamReader::ReadTexture() {
+		
 	}
 };

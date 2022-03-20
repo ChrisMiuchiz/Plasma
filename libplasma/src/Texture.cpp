@@ -17,4 +17,13 @@ namespace plasma {
 	
 	}
 
+	void Texture::SetPixels(u32 width, u32 height, u8* pixelData, const Format& format) {
+		// This is just asking for an OOB read...
+		m_width = width;
+		m_height = height;
+		u32 bytesPerPixel = format.pixelFormat ? 4 : 3;
+		m_pixels.resize(m_width * m_height * bytesPerPixel);
+		memcpy(m_pixels.data(), pixelData, m_pixels.size());
+	}
+
 };

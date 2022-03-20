@@ -11,11 +11,14 @@ namespace plasma {
 	public:
 		friend class PLXStreamReader;
 		ChunkStreamReader(std::ifstream* stream);
-		void ParseChunkLength();
+		void EnterChunk();
 		std::string ReadString();
+		std::wstring ReadWString();
 		std::string ReadObfuscatedString();
-		std::vector<char> ReadByteArray();
-		bool NextChunk();
+		std::vector<char> ReadCharArray();
+		std::vector<u8> ReadByteArray();
+		bool FinishChunk();
+		void SkipChunk();
 		void DeobfuscateString(char* buffer, u32 length, char* obfuscationKey);
 		std::string DeobfuscateString(const std::vector<char>& bytes, u64 key);
 

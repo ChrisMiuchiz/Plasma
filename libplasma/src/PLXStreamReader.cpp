@@ -1,6 +1,10 @@
 #include "PLXStreamReader.h"
 #include <iostream>
 #include "zlib.h"
+#include "Texture.h"
+#include "plutils.h"
+#include "GLEngine.h"
+
 namespace plasma {
 	PLXStreamReader::PLXStreamReader(Engine* engine, PageInfo* pageInfo, Node* targetNode, u32 fileFlags, std::ifstream* stream, std::vector<u64> keys) 
 		: ChunkStreamReader(stream) {
@@ -41,8 +45,6 @@ namespace plasma {
 			std::string chunkName = ParseChunkHeader();
 			std::cout << "Chunk: " << chunkName << std::endl;
 
-			ParseChunkLength(); // this is in the chunk specific blocks in plasma
-
 			if (chunkName == "PlasmaGraphics") {
 				ReadPlasmaGraphics();
 			}
@@ -57,14 +59,8 @@ namespace plasma {
 			else if (chunkName == "Texture") {
 				ReadTexture();
 			}
-
-			// This is for testing, not originally a plasma feature
-			if (m_chunkEnds.size() > 0) {
-				std::streampos next = m_chunkEnds.front();
-				if (next == -1) break;
-				std::cout << next << std::endl;
-				m_chunkEnds.pop_front();
-				m_stream->seekg(next);
+			else {
+				SkipChunk();
 			}
 		}
 	}
@@ -74,7 +70,7 @@ namespace plasma {
 
 		if (chunkID == 0) {
 			// Needs a name definition block
-			ParseChunkLength();
+			EnterChunk();
 			i32 newChunkID = ReadVal<i32>();
 			std::string newChunkName = "";
 			bool unobfuscated = m_obfuscationHash == 0;
@@ -88,7 +84,7 @@ namespace plasma {
 
 			m_chunkTypeNames[newChunkID] = newChunkName;
 
-			NextChunk();
+			FinishChunk();
 
 			chunkID = ReadVal<i32>();
 			
@@ -97,43 +93,53 @@ namespace plasma {
 		return m_chunkTypeNames[chunkID];
 	}
 
-	bool PLXStreamReader::Decompress(const std::vector<char>& input, std::vector<char>& output) {
-		char buffer[128000] = { 0 };
-		Bytef* dest = (Bytef*)&buffer;
-		uLongf destLen = sizeof(buffer);
+	bool PLXStreamReader::Decompress(const std::vector<u8>& input, std::vector<u8>& output) {
+		// TODO: change how buffer is allocated
+		bool result;
+		u32 bufferSize = input.size() * 30;
+		char* buffer = new char[bufferSize];
+		Bytef* dest = (Bytef*)buffer;
+		uLongf destLen = bufferSize;
 		Bytef* source = (Bytef*)input.data();
 		uLong sourceLen = input.size();
-		if (uncompress(dest, &destLen, source, sourceLen) == Z_OK) {
+		int uncompressResult = uncompress(dest, &destLen, source, sourceLen);
+		if (uncompressResult == Z_OK) {
 			output.resize(destLen);
 			memcpy(output.data(), dest, destLen);
-			return false;
+			result = false;
 		}
 		else {
 			output.clear();
-			return true;
+			result = true;
 		}
+
+		delete[] buffer;
+		return result;
 	}
 
 	void PLXStreamReader::ReadPlasmaGraphics() {
+		EnterChunk();
 		u32 version = ReadVal<u32>();
 		std::cout << "PlasmaGraphics version " << version << std::endl;
 		if (version > 1) {
 			//TODO: throw exception
 			std::cout << "PLX wrong version" << std::endl;
 		}
-		NextChunk();
+		FinishChunk();
 	}
 
 	bool PLXStreamReader::ReadSeal() {
 		bool validLicense = false;
 		std::vector<u64> keysToTry = m_keys;
 
+		EnterChunk();
+
 		// Two default keys
 		keysToTry.push_back(0);
 		keysToTry.push_back(StringHash("PlasmaGraphics"));
 
 		std::string magic = "PlasmaGraphics";
-		std::vector<char> obfuscatedMagic = ReadByteArray();
+		std::vector<char> obfuscatedMagic = ReadCharArray();
 
 		for (u64 key : keysToTry) {
 			std::string deobfuscatedMagic = DeobfuscateString(obfuscatedMagic, key);
@@ -143,11 +149,97 @@ namespace plasma {
 			}
 		}
 
-		NextChunk();
+		FinishChunk();
 		return validLicense;
 	}
 
 	void PLXStreamReader::ReadTexture() {
-		
+		EnterChunk();
+		std::wstring textureName;
+		i32 textureID = -1;
+		Texture::Format textureFormat = { 1, 1, 1, 1 };
+		u32 textureWidth = 0;
+		u32 textureHeight = 0;
+		std::vector<u8> pixelsData;
+
+		if (FinishChunk()) return;
+
+		do {
+			std::string chunkName = ParseChunkHeader();
+
+			std::cout << "Texture Chunk: " << chunkName << std::endl;
+			//std::cin.get();
+
+			if (chunkName == "Texture.name") {
+				EnterChunk();
+				textureName = StringToWstring(ReadString());
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.wname") {
+				EnterChunk();
+				textureName = ReadWString();
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.id") {
+				EnterChunk();
+				textureID = ReadVal<i32>();
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.format.pixelFormat") {
+				EnterChunk();
+				textureFormat.pixelFormat = ReadVal<i32>();
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.format.minFilter") {
+				EnterChunk();
+				textureFormat.minFilter = ReadVal<i32>();
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.format.maxFilter") {
+				EnterChunk();
+				textureFormat.maxFilter = ReadVal<i32>();
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.format.horizontalWrap") {
+				EnterChunk();
+				textureFormat.horizontalWrap = ReadVal<i32>();
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.format.verticalWrap") {
+				EnterChunk();
+				textureFormat.verticalWrap = ReadVal<i32>();
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.width") {
+				EnterChunk();
+				textureWidth = ReadVal<u32>();
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.height") {
+				EnterChunk();
+				textureHeight = ReadVal<u32>();
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.pixels") {
+				EnterChunk();
+				pixelsData = ReadByteArray();
+				FinishChunk();
+			}
+			else if (chunkName == "Texture.compressedPixels") {
+				EnterChunk();
+				std::vector<u8> compressedPixels = ReadByteArray();
+				Decompress(compressedPixels, pixelsData);
+				FinishChunk();
+			}
+			else {
+				SkipChunk();
+			}
+
+		} while (!FinishChunk());
+
+		if (textureID != -1) {
+			Texture* newTexture = m_engine->NewTexture(textureWidth, textureHeight, pixelsData.data(), textureFormat, textureName, false);
+			m_textures[textureID] = newTexture;
+		}
 	}
 };

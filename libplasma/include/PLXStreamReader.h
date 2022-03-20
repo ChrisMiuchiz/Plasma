@@ -8,12 +8,13 @@ namespace plasma {
 	class Engine;
 	struct PageInfo;
 	class Node;
+	class Texture;
 	class PLXStreamReader : public ChunkStreamReader {
 	public:
 		PLXStreamReader(Engine* engine, PageInfo* pageInfo, Node* targetNode, u32 fileFlags, std::ifstream* stream, std::vector<u64> keys);
 		void Read();
 		std::string ParseChunkHeader();
-		bool Decompress(const std::vector<char>& input, std::vector<char>& output);
+		bool Decompress(const std::vector<u8>& input, std::vector<u8>& output);
 		void ReadPlasmaGraphics();
 		bool ReadSeal();
 		void ReadTexture();
@@ -28,5 +29,7 @@ namespace plasma {
 		Node* m_targetNode;
 		Engine* m_engine;
 		PageInfo* m_pageInfo;
+
+		std::map<i32, Texture*> m_textures;
 	};
 };

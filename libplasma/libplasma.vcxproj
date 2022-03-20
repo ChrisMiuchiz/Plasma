@@ -19,8 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Attribute.cpp" />
+    <ClCompile Include="src\ContinuousAttribute.cpp" />
     <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\GLTexture.cpp" />
     <ClCompile Include="src\NamedObject.cpp" />
+    <ClCompile Include="src\plutils.cpp" />
     <ClCompile Include="src\PLXStreamReader.cpp" />
     <ClCompile Include="src\ChunkStreamReader.cpp" />
     <ClCompile Include="src\GLEngine.cpp" />
@@ -29,9 +33,13 @@
     <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Attribute.h" />
+    <ClInclude Include="include\ContinuousAttribute.h" />
     <ClInclude Include="include\Engine.h" />
+    <ClInclude Include="include\GLTexture.h" />
     <ClInclude Include="include\NamedObject.h" />
     <ClInclude Include="include\PageInfo.h" />
+    <ClInclude Include="include\plutils.h" />
     <ClInclude Include="include\PLXStreamReader.h" />
     <ClInclude Include="include\ChunkStreamReader.h" />
     <ClInclude Include="include\GLEngine.h" />

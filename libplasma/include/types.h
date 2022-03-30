@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdint>
 
 //#define i8 int8_t

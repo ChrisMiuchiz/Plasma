@@ -94,10 +94,11 @@ namespace plasma {
 	}
 
 	bool PLXStreamReader::Decompress(const std::vector<u8>& input, std::vector<u8>& output) {
-		// TODO: change how buffer is allocated
+		// Plasma originally decompresses in 128k blocks. This expects the
+		// output buffer to be properly sized already.
 		bool result;
-		u32 bufferSize = input.size() * 30;
-		char* buffer = new char[bufferSize];
+		u32 bufferSize = output.size();
+		char* buffer = (char*)output.data();
 		Bytef* dest = (Bytef*)buffer;
 		uLongf destLen = bufferSize;
 		Bytef* source = (Bytef*)input.data();
@@ -113,7 +114,6 @@ namespace plasma {
 			result = true;
 		}
 
-		delete[] buffer;
 		return result;
 	}
 
@@ -157,10 +157,15 @@ namespace plasma {
 		EnterChunk();
 		std::wstring textureName;
 		i32 textureID = -1;
-		Texture::Format textureFormat = { 1, 1, 1, 1 };
+		Texture::Format textureFormat;
 		u32 textureWidth = 0;
 		u32 textureHeight = 0;
 		std::vector<u8> pixelsData;
+
+		// Plasma does not keep track of this separately but this makes it easier to
+		// determine the required buffer size.
+		bool usesCompressedPixels = false;
+		std::vector<u8> compressedPixelsData;
 
 		if (FinishChunk()) return;
 
@@ -223,12 +228,13 @@ namespace plasma {
 			else if (chunkName == "Texture.pixels") {
 				EnterChunk();
 				pixelsData = ReadByteArray();
+				usesCompressedPixels = false;
 				FinishChunk();
 			}
 			else if (chunkName == "Texture.compressedPixels") {
 				EnterChunk();
-				std::vector<u8> compressedPixels = ReadByteArray();
-				Decompress(compressedPixels, pixelsData);
+				compressedPixelsData = ReadByteArray();
+				usesCompressedPixels = true;
 				FinishChunk();
 			}
 			else {
@@ -237,9 +243,20 @@ namespace plasma {
 
 		} while (!FinishChunk());
 
+		// Plasma does not do this, but this allows us to determine the required
+		// buffer size before decompressing
+		if (usesCompressedPixels) {
+			pixelsData.resize(textureWidth * textureHeight * textureFormat.BytesPerPixel());
+			Decompress(compressedPixelsData, pixelsData);
+		}
+
 		if (textureID != -1) {
 			Texture* newTexture = m_engine->NewTexture(textureWidth, textureHeight, pixelsData.data(), textureFormat, textureName, false);
 			m_textures[textureID] = newTexture;
 		}
+	}
+
+	TextShape* PLXStreamReader::ReadTextShape() {
+		return nullptr;
 	}
 };

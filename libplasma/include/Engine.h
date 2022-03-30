@@ -7,6 +7,7 @@
 
 namespace plasma {
 	class Node;
+	class TextShape;
 	class Engine {
 	public:
 		Engine();
@@ -16,6 +17,7 @@ namespace plasma {
 		virtual Texture* NewTexture(u32 width, u32 height, u8* pixelData,
 			const Texture::Format& format, const std::wstring& name,
 			bool noEngineTexture) = 0;
+		TextShape* NewTextShape(const std::wstring& text, const std::wstring& name);
 	private:
 		PageInfo m_pageInfo;
 	};

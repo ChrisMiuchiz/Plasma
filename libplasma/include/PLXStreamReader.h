@@ -9,6 +9,7 @@ namespace plasma {
 	struct PageInfo;
 	class Node;
 	class Texture;
+	class TextShape;
 	class PLXStreamReader : public ChunkStreamReader {
 	public:
 		PLXStreamReader(Engine* engine, PageInfo* pageInfo, Node* targetNode, u32 fileFlags, std::ifstream* stream, std::vector<u64> keys);
@@ -18,6 +19,54 @@ namespace plasma {
 		void ReadPlasmaGraphics();
 		bool ReadSeal();
 		void ReadTexture();
+		TextShape* ReadTextShape();
+
+	private:
+		template <typename T>
+		void RawAttributeDataRead(T* target) {
+			m_stream->read(target, sizeof(T));
+		}
+
+		template <>
+		void RawAttributeDataRead<std::wstring>(std::wstring* target) {
+			std::wstring str = ReadWString();
+			target->assign(str);
+		}
+
+	public:
+		// Example: ReadAttribute<ContinuousAttribute<Vector<4, float>>()
+		template <typename T>
+		void ReadAttribute(T& attribute) {
+			EnterChunk();
+
+			u32 attribtueFrameCount = 0;
+
+			if (FinishChunk()) return;
+
+			do {
+				std::string chunkName = ParseChunkHeader();
+
+				if (chunkName == "Attribute.frame") {
+					EnterChunk();
+
+					if (attribtueFrameCount == attribute.Size()) {
+						attribute.DuplicateElement();
+					}
+
+					//m_stream->read(attribute.Back(), sizeof(T::AttributeType));
+					RawAttributeDataRead(attribute.Back());
+
+					FinishChunk();
+				}
+				else if (chunkName == "Attribute.sequence") {
+					// TODO
+				}
+				else {
+					SkipChunk();
+				}
+			} while (!FinishChunk());
+
+		}
 
 		enum class FLAGS : u32 {
 			CHECK_FORMAT = 0x40

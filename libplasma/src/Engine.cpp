@@ -1,5 +1,7 @@
 #include "Engine.h"
 #include "PLXStreamReader.h"
+#include "TextShape.h"
+
 namespace plasma {
 	Engine::Engine() {
 		m_pageInfo.pageWidth = 1000.0;
@@ -23,5 +25,9 @@ namespace plasma {
 
 		PLXStreamReader reader(this, pageInfo, targetNode, fileFlags, stream, keys);
 		reader.Read();
+	}
+
+	TextShape* Engine::NewTextShape(const std::wstring& text, const std::wstring& name) {
+		return new TextShape(this, name, text);
 	}
 };

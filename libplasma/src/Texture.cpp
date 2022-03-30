@@ -1,6 +1,10 @@
 #include "Texture.h"
 
 namespace plasma {
+	u32 Texture::Format::BytesPerPixel() const {
+		return this->pixelFormat ? 4 : 3;
+	}
+
 	Texture::Texture(Engine* engine, const std::wstring& name, bool noEngineTexture) :
 		NamedObject(engine, name)
 	{
@@ -21,7 +25,7 @@ namespace plasma {
 		// This is just asking for an OOB read...
 		m_width = width;
 		m_height = height;
-		u32 bytesPerPixel = format.pixelFormat ? 4 : 3;
+		u32 bytesPerPixel = format.BytesPerPixel();
 		m_pixels.resize(m_width * m_height * bytesPerPixel);
 		memcpy(m_pixels.data(), pixelData, m_pixels.size());
 	}

@@ -8,4 +8,8 @@ namespace plasma {
 	Attribute::~Attribute() {
 		
 	}
+
+	u32 Attribute::CurrentFrame() {
+		return m_currentIndex;
+	}
 };

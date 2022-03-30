@@ -21,8 +21,10 @@
   <ItemGroup>
     <ClCompile Include="src\Attribute.cpp" />
     <ClCompile Include="src\ContinuousAttribute.cpp" />
+    <ClCompile Include="src\DiscreteAttribute.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\GLTexture.cpp" />
+    <ClCompile Include="src\Keyable.cpp" />
     <ClCompile Include="src\NamedObject.cpp" />
     <ClCompile Include="src\plutils.cpp" />
     <ClCompile Include="src\PLXStreamReader.cpp" />
@@ -30,13 +32,18 @@
     <ClCompile Include="src\GLEngine.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\ObjectManager.cpp" />
+    <ClCompile Include="src\Shape.cpp" />
+    <ClCompile Include="src\TextShape.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Attribute.h" />
     <ClInclude Include="include\ContinuousAttribute.h" />
+    <ClInclude Include="include\DiscreteAttribute.h" />
     <ClInclude Include="include\Engine.h" />
     <ClInclude Include="include\GLTexture.h" />
+    <ClInclude Include="include\Keyable.h" />
     <ClInclude Include="include\NamedObject.h" />
     <ClInclude Include="include\PageInfo.h" />
     <ClInclude Include="include\plutils.h" />
@@ -45,8 +52,11 @@
     <ClInclude Include="include\GLEngine.h" />
     <ClInclude Include="include\Object.h" />
     <ClInclude Include="include\ObjectManager.h" />
+    <ClInclude Include="include\Shape.h" />
+    <ClInclude Include="include\TextShape.h" />
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\types.h" />
+    <ClInclude Include="include\Vector.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
